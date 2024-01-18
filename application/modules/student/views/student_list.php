@@ -1,0 +1,170 @@
+<div class="content-wrapper">
+	<!-- Content Header (Page header) -->
+	<section class="content-header">
+		<h1>
+			<?php echo isset($title) ? '' . $title : null; ?>
+			<small>List</small>
+		</h1>
+		<ol class="breadcrumb">
+			<li><a href="<?php echo site_url('manage') ?>"><i class="fa fa-th"></i> Home</a></li>
+			<li class="active"><?php echo isset($title) ? '' . $title : null; ?></li>
+		</ol>
+	</section>
+	<section class="content">
+		<div class="row">
+			<div class="col-xs-12">
+				<div class="box box-primary">
+					<div class="box-header with-border">
+						<div class="row">
+							<div class="col-sm-6 pull-right">
+								<?php echo form_open(current_url(), array('class' => 'form-horizontal', 'method' => 'get')) ?>
+								<div class="input-group input-group-sm">
+									<input type="text" id="field" autofocus name="n" <?php echo (isset($f['n'])) ? 'placeholder="' . $f['n'] . '"' : 'placeholder="Cari Data Mahasiswa"' ?> class="form-control">
+									<div class="input-group-btn">
+										<button type="submit" class="btn bg-blue"><i class="fa fa-search"></i> Cari Data</button>
+									</div>
+								</div>
+								<?php echo form_close(); ?>
+							</div>
+							<div class="col-sm-6">
+								<form action="<?php echo site_url('manage/student/multiple'); ?>" method="post">
+									<input type="hidden" name="action" value="printPdf">
+									<button type="submit" class="btn btn-danger btn-sm" formtarget="_blank"><span class="fa fa-print"></span> Cetak Kartu</button>
+
+									<?php if ($this->session->userdata('uroleid') == SUPERUSER) { ?>
+										<a href="<?php echo site_url('manage/student/add') ?>" class="btn btn-sm btn-success"><i class="fa fa-plus"></i> Tambah Data</a>
+										<a href="<?php echo site_url('manage/student/import') ?>" class="btn btn-sm btn-primary"><i class="fa fa-upload"></i> Upload Mahasiswa Kolektif</a>
+									<?php } ?>
+							</div>
+						</div>
+					</div>
+					<!-- /.box-header -->
+					<div class="box-body table-responsive">
+						<table class="table table-hover table-striped table-bordered">
+							<tr class="bg-blue">
+								<th class="text-center"><input type="checkbox" id="selectall" value="checkbox" name="checkbox"></th>
+								<th class="text-center">No</th>
+								<th class="text-center">NPM</th>
+								<th class="text-center">NISN</th>
+								<th>Nama</th>
+								<th>Semester</th>
+								<th class="text-center">Status</th>
+								<th class="text-center">Aksi</th>
+							</tr>
+							<tbody>
+								<?php
+								if (!empty($student)) {
+									$i = 1;
+									foreach ($student as $row) :
+								?>
+										<tr>
+											<td>
+												<center><input type="checkbox" class="checkbox" name="msg[]" value="<?php echo $row['student_id']; ?>"></center>
+											</td>
+											<td class="text-center"><?php echo $i;  ?></td>
+											<td class="text-center"><?php echo $row['student_nis']; ?></td>
+											<td class="text-center"><?php echo $row['student_nisn']; ?></td>
+											<td><?php echo $row['student_full_name']; ?></td>
+											<td><?php echo $row['class_name']; ?> <?php echo $row['majors_name']; ?></td>
+											<td class="text-center"><label class="label <?php echo ($row['student_status'] == 1) ? 'label-success' : 'label-danger' ?>"><?php echo ($row['student_status'] == 1) ? '<i class="fa fa-check"></i>' : '<i class="fa fa-close"></i>' ?></label></td>
+											<td class="text-center">
+												<div class="btn-group">
+													<a href="<?php echo site_url('manage/student/rpw/' . $row['student_id']) ?>" class="btn btn-sm bg-orange" data-toggle="tooltip" title="Reset Password"><i class="fa fa-unlock"></i></a>
+													<a href="<?php echo site_url('manage/student/view/' . $row['student_id']) ?>" class="btn btn-sm bg-green" data-toggle="tooltip" title="Lihat"><i class="fa fa-eye"></i></a>
+													<?php if ($this->session->userdata('uroleid') == SUPERUSER) { ?>
+														<a href="<?php echo site_url('manage/student/edit/' . $row['student_id']) ?>" class="btn btn-sm bg-blue" data-toggle="tooltip" title="Edit"><i class="fa fa-pencil-square"></i></a>
+													<?php } ?>
+													<a href="<?php echo site_url('manage/student/printPdf/' . $row['student_id']) ?>" class="btn btn-sm bg-maroon view-pdf" data-toggle="tooltip" title="Cetak Kartu"><i class="fa fa-print"></i></a>
+												</div>
+											</td>
+										</tr>
+									<?php
+										$i++;
+									endforeach;
+								} else {
+									?>
+									<tr id="row">
+										<td colspan="8" align="center">Data Kosong</td>
+									</tr>
+								<?php } ?>
+							</tbody>
+						</table>
+						<?php echo $this->pagination->create_links(); ?>
+					</div>
+					<!-- /.box-body -->
+				</div>
+				<div>
+				</div>
+				<!-- /.box -->
+			</div>
+		</div>
+		</form>
+	</section>
+	<!-- /.content -->
+</div>
+
+<script type="text/javascript">
+	(function(a) {
+		a.createModal = function(b) {
+			defaults = {
+				title: "",
+				message: "Your Message Goes Here!",
+				closeButton: true,
+				scrollable: false
+			};
+			var b = a.extend({}, defaults, b);
+			var c = (b.scrollable === true) ? 'style="max-height: 420px;overflow-y: auto;"' : "";
+			html = '<div class="modal fade" id="myModal">';
+			html += '<div class="modal-dialog">';
+			html += '<div class="modal-content">';
+			html += '<div class="modal-header">';
+			html += '<button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>';
+			if (b.title.length > 0) {
+				html += '<h4 class="modal-title">' + b.title + "</h4>"
+			}
+			html += "</div>";
+			html += '<div class="modal-body" ' + c + ">";
+			html += b.message;
+			html += "</div>";
+			html += '<div class="modal-footer">';
+			if (b.closeButton === true) {
+				html += '<button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>'
+			}
+			html += "</div>";
+			html += "</div>";
+			html += "</div>";
+			html += "</div>";
+			a("body").prepend(html);
+			a("#myModal").modal().on("hidden.bs.modal", function() {
+				a(this).remove()
+			})
+		}
+	})(jQuery);
+
+	/*
+	 * Here is how you use it
+	 */
+	$(function() {
+		$('.view-pdf').on('click', function() {
+			var pdf_link = $(this).attr('href');
+			var iframe = '<object type="application/pdf" data="' + pdf_link + '" width="100%" height="350">No Support</object>'
+			$.createModal({
+				title: 'Cetak Kartu Pembayaran',
+				message: iframe,
+				closeButton: true,
+				scrollable: false
+			});
+			return false;
+		});
+	})
+</script>
+<script>
+	$(document).ready(function() {
+		$("#selectall").change(function() {
+			$(".checkbox").prop('checked', $(this).prop("checked"));
+		});
+	});
+</script>
+<script>
+	$.widget.bridge('uibutton', $.ui.button);
+</script>
